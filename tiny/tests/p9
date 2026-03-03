@@ -1,0 +1,10 @@
+program p_not:
+var n:integer;
+begin
+   n := read;
+   while not (n = 0) do
+   begin
+      output(n);
+      n := n + -1
+   end
+end p_not.

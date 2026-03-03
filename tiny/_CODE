@@ -1,0 +1,18 @@
+       LIT    0             
+       SOS    INPUT         
+       SGV    0             
+L1     LGV    0             
+       LIT    0             
+       BOP    BEQ           
+       UOP    UNOT          
+       COND   L2     L3     
+L2     LGV    0             
+       SOS    OUTPUT        
+       SOS    OUTPUTL       
+       LGV    0             
+       LIT    1             
+       UOP    UNEG          
+       BOP    BPLUS         
+       SGV    0             
+       GOTO   L1            
+L3     HALT                 

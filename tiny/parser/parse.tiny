@@ -1,0 +1,53 @@
+%%
+Tiny       -> PROGRAM Name ':' Dclns Body Name '.' 	=> "program";
+Dclns      -> VAR (Dcln ';')*				=> "dclns"
+           -> 					     	=> "dclns";
+Dcln       -> NameList ':' Type				=> "dcln";
+NameList   -> Name
+           -> NameList ',' Name;
+Type       -> INTEGER 		             		=> "integer"
+           -> BOOLEAN				     	=> "boolean";
+Body       -> BEGINX StmtList END      	=> "block";
+StmtList   -> Statement
+           -> StmtList ';' Statement;
+Statement  -> Name ASSIGNMENT Expression          	=> "assign"
+           -> OUTPUT '(' Expression ')'           	=> "output"
+           -> IF Expression THEN Statement
+                            ELSE Statement       	=> "if"
+           -> WHILE Expression DO Statement      	=> "while"
+           -> Body
+	   ->                                        	=> "<null>";
+
+Expression -> AddTerm
+           -> AddTerm '=' AddTerm                 => "="
+           -> AddTerm NE AddTerm                  => "<>"
+           -> AddTerm '<' AddTerm                 => "<"
+           -> AddTerm '>' AddTerm                 => ">"
+           -> AddTerm LTE AddTerm                 => "<="
+           -> AddTerm GE AddTerm                  => ">=";
+
+AddTerm    -> MulTerm
+           -> AddTerm '+' MulTerm                 => "+"
+           -> AddTerm '-' MulTerm                 => "-"
+           -> AddTerm OR MulTerm                  => "or";
+
+MulTerm    -> PowTerm
+           -> MulTerm '*' PowTerm                 => "*"
+           -> MulTerm '/' PowTerm                 => "/"
+           -> MulTerm AND PowTerm                 => "and"
+           -> MulTerm MOD PowTerm                 => "mod";
+
+PowTerm    -> UnaryTerm
+           -> UnaryTerm EXP PowTerm               => "**";
+
+UnaryTerm  -> Primary
+           -> '-' UnaryTerm                       => "-"
+           -> '+' UnaryTerm                       => "u+"
+           -> NOT UnaryTerm                       => "not";
+
+Primary    -> READ                                => "read"
+           -> Name
+           -> INTEGER_NUM                         => "<integer>"
+           -> '(' Expression ')';
+
+Name       -> IDENTIFIER				=> "<identifier>";
