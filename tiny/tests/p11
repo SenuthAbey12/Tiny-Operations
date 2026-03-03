@@ -1,0 +1,7 @@
+program test:
+var b : boolean;
+begin
+   b := false;
+   if b then output(1)
+   else output(0)
+end test.

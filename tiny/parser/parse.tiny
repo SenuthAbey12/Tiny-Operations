@@ -46,6 +46,8 @@ UnaryTerm  -> Primary
            -> NOT UnaryTerm                       => "not";
 
 Primary    -> READ                                => "read"
+           -> TRUE                                => "<true>"
+           -> FALSE                               => "<false>"
            -> Name
            -> INTEGER_NUM                         => "<integer>"
            -> '(' Expression ')';

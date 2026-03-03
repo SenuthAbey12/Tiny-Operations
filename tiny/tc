@@ -11,9 +11,12 @@ then
   echo
   echo -n "Input file: "
   read INPUT
+elif [ ${#} -eq 2 ]
+then
+  INPUT=${1}/${2}
 else
   INPUT=${1}
-fi  
+fi
 parser/parse < ${INPUT} || exit 1
 echo "Done parsing."
 echo "Enter Constrainer ..."

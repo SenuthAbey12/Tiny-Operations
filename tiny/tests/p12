@@ -1,0 +1,8 @@
+program test:
+var a,b : boolean;
+begin
+   a := true and false;
+   if a then output(1) else output(0);
+   b := true or false;
+   if b then output(2) else output(3)
+end test.

@@ -104,8 +104,10 @@
 #define    ExpNode      77   /* '**'       */
 #define    UPlusNode    78   /* 'u+'       */
 #define    NotNode      79   /* 'not'      */
+#define    TrueNode     80   /* '<true>'   */
+#define    FalseNode    81   /* '<false>'  */
 
-#define    NumberOfNodes 79 /* 'not'      */
+#define    NumberOfNodes 81
 typedef int Mode;
 
 FILE *CodeFile;
@@ -130,7 +132,8 @@ char *node_name[] =
      "boolean","block","assign","output","if","while",
      "<null>","<=","+","-","read","<integer>","<identifier>",
      "or","and","=","<>","<",">",">=",
-     "*","/","mod","**","u+","not"};
+     "*","/","mod","**","u+","not",
+     "<true>","<false>"};
 
 
 void CodeGenerate(int argc, char *argv[])
@@ -303,6 +306,16 @@ void Expression (TreeNode T, Clabel CurrLabel)
 
       case IntegerNode :
          CodeGen1 (LITOP, NodeName (Child(T,1)), CurrLabel);
+         IncrementFrameSize();
+         break;
+
+      case TrueNode :
+         CodeGen1 (LITOP, MakeStringOf(1), CurrLabel);
+         IncrementFrameSize();
+         break;
+
+      case FalseNode :
+         CodeGen1 (LITOP, MakeStringOf(0), CurrLabel);
          IncrementFrameSize();
          break;
 

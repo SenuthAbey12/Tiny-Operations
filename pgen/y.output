@@ -1,678 +1,701 @@
-Terminals unused in grammar
 
-    LIT
+
+Terminals which are not used:
+
+   LIT
+
 
 
 Grammar
-
-    0 $accept: spec $end
-
-    1 spec: defs MARK rules
-
-    2 defs: ε
-    3     | defs def
-
-    4 def: NODE nlist
-
-    5 nlist: yid
-    6      | nlist yid
-    7      | nlist ',' yid
-
-    8 yid: IDENTIFIER
-    9    | LITERAL
-
-   10 rules: rule
-   11      | rules rule
-
-   12 rule: IDENTIFIER OR rbody ';'
-   13     | IDENTIFIER OR rbody ACTION STRING ';'
-   14     | IDENTIFIER OR rbody or ';'
-   15     | IDENTIFIER OR rbody ACTION STRING or ';'
-
-   16 or: OR rbody
-   17   | OR rbody ACTION STRING
-   18   | or OR rbody
-   19   | or OR rbody ACTION STRING
-
-   20 rbody: ε
-   21      | rexp
-
-   22 rexp: term
-   23     | PIPE term
-   24     | rexp PIPE term
-
-   25 term: fact
-   26     | term fact
-
-   27 fact: prim
-   28     | prim rop
-
-   29 prim: yid
-   30     | '(' rexp ')'
-
-   31 rop: PLUS
-   32    | STAR
-   33    | QUESTION
-   34    | LIST prim
-
+rule 1    spec -> defs MARK rules
+rule 2    defs ->		/* empty */
+rule 3    defs -> defs def
+rule 4    def -> NODE nlist
+rule 5    nlist -> yid
+rule 6    nlist -> nlist yid
+rule 7    nlist -> nlist ',' yid
+rule 8    yid -> IDENTIFIER
+rule 9    yid -> LITERAL
+rule 10   rules -> rule
+rule 11   rules -> rules rule
+rule 12   rule -> IDENTIFIER OR rbody ';'
+rule 13   rule -> IDENTIFIER OR rbody ACTION STRING ';'
+rule 14   rule -> IDENTIFIER OR rbody or ';'
+rule 15   rule -> IDENTIFIER OR rbody ACTION STRING or ';'
+rule 16   or -> OR rbody
+rule 17   or -> OR rbody ACTION STRING
+rule 18   or -> or OR rbody
+rule 19   or -> or OR rbody ACTION STRING
+rule 20   rbody ->		/* empty */
+rule 21   rbody -> rexp
+rule 22   rexp -> term
+rule 23   rexp -> PIPE term
+rule 24   rexp -> rexp PIPE term
+rule 25   term -> fact
+rule 26   term -> term fact
+rule 27   fact -> prim
+rule 28   fact -> prim rop
+rule 29   prim -> yid
+rule 30   prim -> '(' rexp ')'
+rule 31   rop -> PLUS
+rule 32   rop -> STAR
+rule 33   rop -> QUESTION
+rule 34   rop -> LIST prim
 
 Terminals, with rules where they appear
 
-    $end (0) 0
-    '(' (40) 30
-    ')' (41) 30
-    ',' (44) 7
-    ';' (59) 12 13 14 15
-    error (256)
-    MARK <info> (258) 1
-    NODE <info> (259) 4
-    OR <info> (260) 12 13 14 15 16 17 18 19
-    LIST <info> (261) 34
-    ACTION <info> (262) 13 15 17 19
-    IDENTIFIER <info> (263) 8 12 13 14 15
-    LITERAL <info> (264) 9
-    STRING <info> (265) 13 15 17 19
-    LIT <info> (266)
-    PIPE <info> (267) 23 24
-    STAR <info> (268) 32
-    PLUS <info> (269) 31
-    QUESTION <info> (270) 33
-
+$ (-1)
+'(' (40) 30
+')' (41) 30
+',' (44) 7
+';' (59) 12 13 14 15
+error (256)
+MARK (258) 1
+NODE (259) 4
+OR (260) 12 13 14 15 16 17 18 19
+LIST (261) 34
+ACTION (262) 13 15 17 19
+IDENTIFIER (263) 8 12 13 14 15
+LITERAL (264) 9
+STRING (265) 13 15 17 19
+LIT (266)
+PIPE (267) 23 24
+STAR (268) 32
+PLUS (269) 31
+QUESTION (270) 33
 
 Nonterminals, with rules where they appear
 
-    $accept (20)
-        on left: 0
-    spec <nodeptr> (21)
-        on left: 1
-        on right: 0
-    defs <nodeptr> (22)
-        on left: 2 3
-        on right: 1 3
-    def <nodeptr> (23)
-        on left: 4
-        on right: 3
-    nlist <nodeptr> (24)
-        on left: 5 6 7
-        on right: 4 6 7
-    yid <nodeptr> (25)
-        on left: 8 9
-        on right: 5 6 7 29
-    rules <nodeptr> (26)
-        on left: 10 11
-        on right: 1 11
-    rule <nodeptr> (27)
-        on left: 12 13 14 15
-        on right: 10 11
-    or <nodeptr> (28)
-        on left: 16 17 18 19
-        on right: 14 15 18 19
-    rbody <nodeptr> (29)
-        on left: 20 21
-        on right: 12 13 14 15 16 17 18 19
-    rexp <nodeptr> (30)
-        on left: 22 23 24
-        on right: 21 24 30
-    term <nodeptr> (31)
-        on left: 25 26
-        on right: 22 23 24 26
-    fact <nodeptr> (32)
-        on left: 27 28
-        on right: 25 26
-    prim <nodeptr> (33)
-        on left: 29 30
-        on right: 27 28 34
-    rop <nodeptr> (34)
-        on left: 31 32 33 34
-        on right: 28
+spec (20)
+    on left: 1
+defs (21)
+    on left: 2 3, on right: 1 3
+def (22)
+    on left: 4, on right: 3
+nlist (23)
+    on left: 5 6 7, on right: 4 6 7
+yid (24)
+    on left: 8 9, on right: 5 6 7 29
+rules (25)
+    on left: 10 11, on right: 1 11
+rule (26)
+    on left: 12 13 14 15, on right: 10 11
+or (27)
+    on left: 16 17 18 19, on right: 14 15 18 19
+rbody (28)
+    on left: 20 21, on right: 12 13 14 15 16 17 18 19
+rexp (29)
+    on left: 22 23 24, on right: 21 24 30
+term (30)
+    on left: 25 26, on right: 22 23 24 26
+fact (31)
+    on left: 27 28, on right: 25 26
+prim (32)
+    on left: 29 30, on right: 27 28 34
+rop (33)
+    on left: 31 32 33 34, on right: 28
 
 
-State 0
+state 0
 
-    0 $accept: • spec $end
+    $default	reduce using rule 2 (defs)
 
-    $default  reduce using rule 2 (defs)
+    spec	go to state 53
+    defs	go to state 1
 
-    spec  go to state 1
-    defs  go to state 2
 
 
-State 1
+state 1
 
-    0 $accept: spec • $end
+    spec  ->  defs . MARK rules   (rule 1)
+    defs  ->  defs . def   (rule 3)
 
-    $end  shift, and go to state 3
+    MARK	shift, and go to state 2
+    NODE	shift, and go to state 3
 
+    def 	go to state 4
 
-State 2
 
-    1 spec: defs • MARK rules
-    3 defs: defs • def
 
-    MARK  shift, and go to state 4
-    NODE  shift, and go to state 5
+state 2
 
-    def  go to state 6
+    spec  ->  defs MARK . rules   (rule 1)
 
+    IDENTIFIER	shift, and go to state 5
 
-State 3
+    rules	go to state 6
+    rule	go to state 7
 
-    0 $accept: spec $end •
 
-    $default  accept
 
+state 3
 
-State 4
+    def  ->  NODE . nlist   (rule 4)
 
-    1 spec: defs MARK • rules
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
 
-    IDENTIFIER  shift, and go to state 7
+    nlist	go to state 10
+    yid 	go to state 11
 
-    rules  go to state 8
-    rule   go to state 9
 
 
-State 5
+state 4
 
-    4 def: NODE • nlist
+    defs  ->  defs def .   (rule 3)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
+    $default	reduce using rule 3 (defs)
 
-    nlist  go to state 12
-    yid    go to state 13
 
 
-State 6
+state 5
 
-    3 defs: defs def •
+    rule  ->  IDENTIFIER . OR rbody ';'   (rule 12)
+    rule  ->  IDENTIFIER . OR rbody ACTION STRING ';'   (rule 13)
+    rule  ->  IDENTIFIER . OR rbody or ';'   (rule 14)
+    rule  ->  IDENTIFIER . OR rbody ACTION STRING or ';'   (rule 15)
 
-    $default  reduce using rule 3 (defs)
+    OR  	shift, and go to state 12
 
 
-State 7
 
-   12 rule: IDENTIFIER • OR rbody ';'
-   13     | IDENTIFIER • OR rbody ACTION STRING ';'
-   14     | IDENTIFIER • OR rbody or ';'
-   15     | IDENTIFIER • OR rbody ACTION STRING or ';'
+state 6
 
-    OR  shift, and go to state 14
+    spec  ->  defs MARK rules .   (rule 1)
+    rules  ->  rules . rule   (rule 11)
 
+    IDENTIFIER	shift, and go to state 5
 
-State 8
+    $default	reduce using rule 1 (spec)
 
-    1 spec: defs MARK rules •
-   11 rules: rules • rule
+    rule	go to state 13
 
-    IDENTIFIER  shift, and go to state 7
 
-    $default  reduce using rule 1 (spec)
 
-    rule  go to state 15
+state 7
 
+    rules  ->  rule .   (rule 10)
 
-State 9
+    $default	reduce using rule 10 (rules)
 
-   10 rules: rule •
 
-    $default  reduce using rule 10 (rules)
 
+state 8
 
-State 10
+    yid  ->  IDENTIFIER .   (rule 8)
 
-    8 yid: IDENTIFIER •
+    $default	reduce using rule 8 (yid)
 
-    $default  reduce using rule 8 (yid)
 
 
-State 11
+state 9
 
-    9 yid: LITERAL •
+    yid  ->  LITERAL .   (rule 9)
 
-    $default  reduce using rule 9 (yid)
+    $default	reduce using rule 9 (yid)
 
 
-State 12
 
-    4 def: NODE nlist •
-    6 nlist: nlist • yid
-    7      | nlist • ',' yid
+state 10
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    ','         shift, and go to state 16
+    def  ->  NODE nlist .   (rule 4)
+    nlist  ->  nlist . yid   (rule 6)
+    nlist  ->  nlist . ',' yid   (rule 7)
 
-    $default  reduce using rule 4 (def)
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    ',' 	shift, and go to state 14
 
-    yid  go to state 17
+    $default	reduce using rule 4 (def)
 
+    yid 	go to state 15
 
-State 13
 
-    5 nlist: yid •
 
-    $default  reduce using rule 5 (nlist)
+state 11
 
+    nlist  ->  yid .   (rule 5)
 
-State 14
+    $default	reduce using rule 5 (nlist)
 
-   12 rule: IDENTIFIER OR • rbody ';'
-   13     | IDENTIFIER OR • rbody ACTION STRING ';'
-   14     | IDENTIFIER OR • rbody or ';'
-   15     | IDENTIFIER OR • rbody ACTION STRING or ';'
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    PIPE        shift, and go to state 18
-    '('         shift, and go to state 19
 
-    $default  reduce using rule 20 (rbody)
+state 12
 
-    yid    go to state 20
-    rbody  go to state 21
-    rexp   go to state 22
-    term   go to state 23
-    fact   go to state 24
-    prim   go to state 25
+    rule  ->  IDENTIFIER OR . rbody ';'   (rule 12)
+    rule  ->  IDENTIFIER OR . rbody ACTION STRING ';'   (rule 13)
+    rule  ->  IDENTIFIER OR . rbody or ';'   (rule 14)
+    rule  ->  IDENTIFIER OR . rbody ACTION STRING or ';'   (rule 15)
 
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    PIPE	shift, and go to state 16
+    '(' 	shift, and go to state 17
 
-State 15
+    $default	reduce using rule 20 (rbody)
 
-   11 rules: rules rule •
+    yid 	go to state 18
+    rbody	go to state 19
+    rexp	go to state 20
+    term	go to state 21
+    fact	go to state 22
+    prim	go to state 23
 
-    $default  reduce using rule 11 (rules)
 
 
-State 16
+state 13
 
-    7 nlist: nlist ',' • yid
+    rules  ->  rules rule .   (rule 11)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
+    $default	reduce using rule 11 (rules)
 
-    yid  go to state 26
 
 
-State 17
+state 14
 
-    6 nlist: nlist yid •
+    nlist  ->  nlist ',' . yid   (rule 7)
 
-    $default  reduce using rule 6 (nlist)
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
 
+    yid 	go to state 24
 
-State 18
 
-   23 rexp: PIPE • term
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    '('         shift, and go to state 19
+state 15
 
-    yid   go to state 20
-    term  go to state 27
-    fact  go to state 24
-    prim  go to state 25
+    nlist  ->  nlist yid .   (rule 6)
 
+    $default	reduce using rule 6 (nlist)
 
-State 19
 
-   30 prim: '(' • rexp ')'
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    PIPE        shift, and go to state 18
-    '('         shift, and go to state 19
+state 16
 
-    yid   go to state 20
-    rexp  go to state 28
-    term  go to state 23
-    fact  go to state 24
-    prim  go to state 25
+    rexp  ->  PIPE . term   (rule 23)
 
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    '(' 	shift, and go to state 17
 
-State 20
+    yid 	go to state 18
+    term	go to state 25
+    fact	go to state 22
+    prim	go to state 23
 
-   29 prim: yid •
 
-    $default  reduce using rule 29 (prim)
 
+state 17
 
-State 21
+    prim  ->  '(' . rexp ')'   (rule 30)
 
-   12 rule: IDENTIFIER OR rbody • ';'
-   13     | IDENTIFIER OR rbody • ACTION STRING ';'
-   14     | IDENTIFIER OR rbody • or ';'
-   15     | IDENTIFIER OR rbody • ACTION STRING or ';'
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    PIPE	shift, and go to state 16
+    '(' 	shift, and go to state 17
 
-    OR      shift, and go to state 29
-    ACTION  shift, and go to state 30
-    ';'     shift, and go to state 31
+    yid 	go to state 18
+    rexp	go to state 26
+    term	go to state 21
+    fact	go to state 22
+    prim	go to state 23
 
-    or  go to state 32
 
 
-State 22
+state 18
 
-   21 rbody: rexp •
-   24 rexp: rexp • PIPE term
+    prim  ->  yid .   (rule 29)
 
-    PIPE  shift, and go to state 33
+    $default	reduce using rule 29 (prim)
 
-    $default  reduce using rule 21 (rbody)
 
 
-State 23
+state 19
 
-   22 rexp: term •
-   26 term: term • fact
+    rule  ->  IDENTIFIER OR rbody . ';'   (rule 12)
+    rule  ->  IDENTIFIER OR rbody . ACTION STRING ';'   (rule 13)
+    rule  ->  IDENTIFIER OR rbody . or ';'   (rule 14)
+    rule  ->  IDENTIFIER OR rbody . ACTION STRING or ';'   (rule 15)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    '('         shift, and go to state 19
+    OR  	shift, and go to state 27
+    ACTION	shift, and go to state 28
+    ';' 	shift, and go to state 29
 
-    $default  reduce using rule 22 (rexp)
+    or  	go to state 30
 
-    yid   go to state 20
-    fact  go to state 34
-    prim  go to state 25
 
 
-State 24
+state 20
 
-   25 term: fact •
+    rbody  ->  rexp .   (rule 21)
+    rexp  ->  rexp . PIPE term   (rule 24)
 
-    $default  reduce using rule 25 (term)
+    PIPE	shift, and go to state 31
 
+    $default	reduce using rule 21 (rbody)
 
-State 25
 
-   27 fact: prim •
-   28     | prim • rop
 
-    LIST      shift, and go to state 35
-    STAR      shift, and go to state 36
-    PLUS      shift, and go to state 37
-    QUESTION  shift, and go to state 38
+state 21
 
-    $default  reduce using rule 27 (fact)
+    rexp  ->  term .   (rule 22)
+    term  ->  term . fact   (rule 26)
 
-    rop  go to state 39
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    '(' 	shift, and go to state 17
 
+    $default	reduce using rule 22 (rexp)
 
-State 26
+    yid 	go to state 18
+    fact	go to state 32
+    prim	go to state 23
 
-    7 nlist: nlist ',' yid •
 
-    $default  reduce using rule 7 (nlist)
 
+state 22
 
-State 27
+    term  ->  fact .   (rule 25)
 
-   23 rexp: PIPE term •
-   26 term: term • fact
+    $default	reduce using rule 25 (term)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    '('         shift, and go to state 19
 
-    $default  reduce using rule 23 (rexp)
 
-    yid   go to state 20
-    fact  go to state 34
-    prim  go to state 25
+state 23
 
+    fact  ->  prim .   (rule 27)
+    fact  ->  prim . rop   (rule 28)
 
-State 28
+    LIST	shift, and go to state 33
+    STAR	shift, and go to state 34
+    PLUS	shift, and go to state 35
+    QUESTION	shift, and go to state 36
 
-   24 rexp: rexp • PIPE term
-   30 prim: '(' rexp • ')'
+    $default	reduce using rule 27 (fact)
 
-    PIPE  shift, and go to state 33
-    ')'   shift, and go to state 40
+    rop 	go to state 37
 
 
-State 29
 
-   16 or: OR • rbody
-   17   | OR • rbody ACTION STRING
+state 24
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    PIPE        shift, and go to state 18
-    '('         shift, and go to state 19
+    nlist  ->  nlist ',' yid .   (rule 7)
 
-    $default  reduce using rule 20 (rbody)
+    $default	reduce using rule 7 (nlist)
 
-    yid    go to state 20
-    rbody  go to state 41
-    rexp   go to state 22
-    term   go to state 23
-    fact   go to state 24
-    prim   go to state 25
 
 
-State 30
+state 25
 
-   13 rule: IDENTIFIER OR rbody ACTION • STRING ';'
-   15     | IDENTIFIER OR rbody ACTION • STRING or ';'
+    rexp  ->  PIPE term .   (rule 23)
+    term  ->  term . fact   (rule 26)
 
-    STRING  shift, and go to state 42
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    '(' 	shift, and go to state 17
 
+    $default	reduce using rule 23 (rexp)
 
-State 31
+    yid 	go to state 18
+    fact	go to state 32
+    prim	go to state 23
 
-   12 rule: IDENTIFIER OR rbody ';' •
 
-    $default  reduce using rule 12 (rule)
 
+state 26
 
-State 32
+    rexp  ->  rexp . PIPE term   (rule 24)
+    prim  ->  '(' rexp . ')'   (rule 30)
 
-   14 rule: IDENTIFIER OR rbody or • ';'
-   18 or: or • OR rbody
-   19   | or • OR rbody ACTION STRING
+    PIPE	shift, and go to state 31
+    ')' 	shift, and go to state 38
 
-    OR   shift, and go to state 43
-    ';'  shift, and go to state 44
 
 
-State 33
+state 27
 
-   24 rexp: rexp PIPE • term
+    or  ->  OR . rbody   (rule 16)
+    or  ->  OR . rbody ACTION STRING   (rule 17)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    '('         shift, and go to state 19
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    PIPE	shift, and go to state 16
+    '(' 	shift, and go to state 17
 
-    yid   go to state 20
-    term  go to state 45
-    fact  go to state 24
-    prim  go to state 25
+    $default	reduce using rule 20 (rbody)
 
+    yid 	go to state 18
+    rbody	go to state 39
+    rexp	go to state 20
+    term	go to state 21
+    fact	go to state 22
+    prim	go to state 23
 
-State 34
 
-   26 term: term fact •
 
-    $default  reduce using rule 26 (term)
+state 28
 
+    rule  ->  IDENTIFIER OR rbody ACTION . STRING ';'   (rule 13)
+    rule  ->  IDENTIFIER OR rbody ACTION . STRING or ';'   (rule 15)
 
-State 35
+    STRING	shift, and go to state 40
 
-   34 rop: LIST • prim
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    '('         shift, and go to state 19
 
-    yid   go to state 20
-    prim  go to state 46
+state 29
 
+    rule  ->  IDENTIFIER OR rbody ';' .   (rule 12)
 
-State 36
+    $default	reduce using rule 12 (rule)
 
-   32 rop: STAR •
 
-    $default  reduce using rule 32 (rop)
 
+state 30
 
-State 37
+    rule  ->  IDENTIFIER OR rbody or . ';'   (rule 14)
+    or  ->  or . OR rbody   (rule 18)
+    or  ->  or . OR rbody ACTION STRING   (rule 19)
 
-   31 rop: PLUS •
+    OR  	shift, and go to state 41
+    ';' 	shift, and go to state 42
 
-    $default  reduce using rule 31 (rop)
 
 
-State 38
+state 31
 
-   33 rop: QUESTION •
+    rexp  ->  rexp PIPE . term   (rule 24)
 
-    $default  reduce using rule 33 (rop)
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    '(' 	shift, and go to state 17
 
+    yid 	go to state 18
+    term	go to state 43
+    fact	go to state 22
+    prim	go to state 23
 
-State 39
 
-   28 fact: prim rop •
 
-    $default  reduce using rule 28 (fact)
+state 32
 
+    term  ->  term fact .   (rule 26)
 
-State 40
+    $default	reduce using rule 26 (term)
 
-   30 prim: '(' rexp ')' •
 
-    $default  reduce using rule 30 (prim)
 
+state 33
 
-State 41
+    rop  ->  LIST . prim   (rule 34)
 
-   16 or: OR rbody •
-   17   | OR rbody • ACTION STRING
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    '(' 	shift, and go to state 17
 
-    ACTION  shift, and go to state 47
+    yid 	go to state 18
+    prim	go to state 44
 
-    $default  reduce using rule 16 (or)
 
 
-State 42
+state 34
 
-   13 rule: IDENTIFIER OR rbody ACTION STRING • ';'
-   15     | IDENTIFIER OR rbody ACTION STRING • or ';'
+    rop  ->  STAR .   (rule 32)
 
-    OR   shift, and go to state 29
-    ';'  shift, and go to state 48
+    $default	reduce using rule 32 (rop)
 
-    or  go to state 49
 
 
-State 43
+state 35
 
-   18 or: or OR • rbody
-   19   | or OR • rbody ACTION STRING
+    rop  ->  PLUS .   (rule 31)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    PIPE        shift, and go to state 18
-    '('         shift, and go to state 19
+    $default	reduce using rule 31 (rop)
 
-    $default  reduce using rule 20 (rbody)
 
-    yid    go to state 20
-    rbody  go to state 50
-    rexp   go to state 22
-    term   go to state 23
-    fact   go to state 24
-    prim   go to state 25
 
+state 36
 
-State 44
+    rop  ->  QUESTION .   (rule 33)
 
-   14 rule: IDENTIFIER OR rbody or ';' •
+    $default	reduce using rule 33 (rop)
 
-    $default  reduce using rule 14 (rule)
 
 
-State 45
+state 37
 
-   24 rexp: rexp PIPE term •
-   26 term: term • fact
+    fact  ->  prim rop .   (rule 28)
 
-    IDENTIFIER  shift, and go to state 10
-    LITERAL     shift, and go to state 11
-    '('         shift, and go to state 19
+    $default	reduce using rule 28 (fact)
 
-    $default  reduce using rule 24 (rexp)
 
-    yid   go to state 20
-    fact  go to state 34
-    prim  go to state 25
 
+state 38
 
-State 46
+    prim  ->  '(' rexp ')' .   (rule 30)
 
-   34 rop: LIST prim •
+    $default	reduce using rule 30 (prim)
 
-    $default  reduce using rule 34 (rop)
 
 
-State 47
+state 39
 
-   17 or: OR rbody ACTION • STRING
+    or  ->  OR rbody .   (rule 16)
+    or  ->  OR rbody . ACTION STRING   (rule 17)
 
-    STRING  shift, and go to state 51
+    ACTION	shift, and go to state 45
 
+    $default	reduce using rule 16 (or)
 
-State 48
 
-   13 rule: IDENTIFIER OR rbody ACTION STRING ';' •
 
-    $default  reduce using rule 13 (rule)
+state 40
 
+    rule  ->  IDENTIFIER OR rbody ACTION STRING . ';'   (rule 13)
+    rule  ->  IDENTIFIER OR rbody ACTION STRING . or ';'   (rule 15)
 
-State 49
+    OR  	shift, and go to state 27
+    ';' 	shift, and go to state 46
 
-   15 rule: IDENTIFIER OR rbody ACTION STRING or • ';'
-   18 or: or • OR rbody
-   19   | or • OR rbody ACTION STRING
+    or  	go to state 47
 
-    OR   shift, and go to state 43
-    ';'  shift, and go to state 52
 
 
-State 50
+state 41
 
-   18 or: or OR rbody •
-   19   | or OR rbody • ACTION STRING
+    or  ->  or OR . rbody   (rule 18)
+    or  ->  or OR . rbody ACTION STRING   (rule 19)
 
-    ACTION  shift, and go to state 53
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    PIPE	shift, and go to state 16
+    '(' 	shift, and go to state 17
 
-    $default  reduce using rule 18 (or)
+    $default	reduce using rule 20 (rbody)
 
+    yid 	go to state 18
+    rbody	go to state 48
+    rexp	go to state 20
+    term	go to state 21
+    fact	go to state 22
+    prim	go to state 23
 
-State 51
 
-   17 or: OR rbody ACTION STRING •
 
-    $default  reduce using rule 17 (or)
+state 42
 
+    rule  ->  IDENTIFIER OR rbody or ';' .   (rule 14)
 
-State 52
+    $default	reduce using rule 14 (rule)
 
-   15 rule: IDENTIFIER OR rbody ACTION STRING or ';' •
 
-    $default  reduce using rule 15 (rule)
 
+state 43
 
-State 53
+    rexp  ->  rexp PIPE term .   (rule 24)
+    term  ->  term . fact   (rule 26)
 
-   19 or: or OR rbody ACTION • STRING
+    IDENTIFIER	shift, and go to state 8
+    LITERAL	shift, and go to state 9
+    '(' 	shift, and go to state 17
 
-    STRING  shift, and go to state 54
+    $default	reduce using rule 24 (rexp)
 
+    yid 	go to state 18
+    fact	go to state 32
+    prim	go to state 23
 
-State 54
 
-   19 or: or OR rbody ACTION STRING •
 
-    $default  reduce using rule 19 (or)
+state 44
+
+    rop  ->  LIST prim .   (rule 34)
+
+    $default	reduce using rule 34 (rop)
+
+
+
+state 45
+
+    or  ->  OR rbody ACTION . STRING   (rule 17)
+
+    STRING	shift, and go to state 49
+
+
+
+state 46
+
+    rule  ->  IDENTIFIER OR rbody ACTION STRING ';' .   (rule 13)
+
+    $default	reduce using rule 13 (rule)
+
+
+
+state 47
+
+    rule  ->  IDENTIFIER OR rbody ACTION STRING or . ';'   (rule 15)
+    or  ->  or . OR rbody   (rule 18)
+    or  ->  or . OR rbody ACTION STRING   (rule 19)
+
+    OR  	shift, and go to state 41
+    ';' 	shift, and go to state 50
+
+
+
+state 48
+
+    or  ->  or OR rbody .   (rule 18)
+    or  ->  or OR rbody . ACTION STRING   (rule 19)
+
+    ACTION	shift, and go to state 51
+
+    $default	reduce using rule 18 (or)
+
+
+
+state 49
+
+    or  ->  OR rbody ACTION STRING .   (rule 17)
+
+    $default	reduce using rule 17 (or)
+
+
+
+state 50
+
+    rule  ->  IDENTIFIER OR rbody ACTION STRING or ';' .   (rule 15)
+
+    $default	reduce using rule 15 (rule)
+
+
+
+state 51
+
+    or  ->  or OR rbody ACTION . STRING   (rule 19)
+
+    STRING	shift, and go to state 52
+
+
+
+state 52
+
+    or  ->  or OR rbody ACTION STRING .   (rule 19)
+
+    $default	reduce using rule 19 (or)
+
+
+
+state 53
+
+    $   	go to state 54
+
+
+
+state 54
+
+    $   	go to state 55
+
+
+
+state 55
+
+    $default	accept
