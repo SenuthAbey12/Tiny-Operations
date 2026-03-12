@@ -89,25 +89,26 @@
 #define    PlusNode     62   /* '+'        */
 #define    MinusNode    63   /* '-'        */
 #define    ReadNode     64   /* 'read'     */
-#define    IntegerNode  65   /* '<integer>'*/
-#define    IdentifierNode 66 /* '<identifier>'*/
-#define    OrNode       67   /* 'or'       */
-#define    AndNode      68   /* 'and'      */
-#define    EqNode       69   /* '='        */
-#define    NeNode       70   /* '<>'       */
-#define    LtNode       71   /* '<'        */
-#define    GtNode       72   /* '>'        */
-#define    GeNode       73   /* '>='       */
-#define    MultNode     74   /* '*'        */
-#define    DivNode      75   /* '/'        */
-#define    ModNode      76   /* 'mod'      */
-#define    ExpNode      77   /* '**'       */
-#define    UPlusNode    78   /* 'u+'       */
-#define    NotNode      79   /* 'not'      */
-#define    TrueNode     80   /* '<true>'   */
-#define    FalseNode    81   /* '<false>'  */
+#define    EofNode      65   /* 'eof'      */
+#define    IntegerNode  66   /* '<integer>'*/
+#define    IdentifierNode 67 /* '<identifier>'*/
+#define    OrNode       68   /* 'or'       */
+#define    AndNode      69   /* 'and'      */
+#define    EqNode       70   /* '='        */
+#define    NeNode       71   /* '<>'       */
+#define    LtNode       72   /* '<'        */
+#define    GtNode       73   /* '>'        */
+#define    GeNode       74   /* '>='       */
+#define    MultNode     75   /* '*'        */
+#define    DivNode      76   /* '/'        */
+#define    ModNode      77   /* 'mod'      */
+#define    ExpNode      78   /* '**'       */
+#define    UPlusNode    79   /* 'u+'       */
+#define    NotNode      80   /* 'not'      */
+#define    TrueNode     81   /* '<true>'   */
+#define    FalseNode    82   /* '<false>'  */
 
-#define    NumberOfNodes 81
+#define    NumberOfNodes 82
 typedef int Mode;
 
 FILE *CodeFile;
@@ -130,7 +131,7 @@ char *mach_op[] =
 char *node_name[] =
     {"program","types","type","dclns","dcln","integer",
      "boolean","block","assign","output","if","while",
-     "<null>","<=","+","-","read","<integer>","<identifier>",
+   "<null>","<=","+","-","read","eof","<integer>","<identifier>",
      "or","and","=","<>","<",">",">=",
      "*","/","mod","**","u+","not",
      "<true>","<false>"};
@@ -301,6 +302,11 @@ void Expression (TreeNode T, Clabel CurrLabel)
 
       case ReadNode :
          CodeGen1 (SOSOP, OSINPUT, CurrLabel);
+         IncrementFrameSize();
+         break;
+
+      case EofNode :
+         CodeGen1 (SOSOP, OSEOF, CurrLabel);
          IncrementFrameSize();
          break;
 

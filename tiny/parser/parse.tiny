@@ -11,12 +11,16 @@ Body       -> BEGINX StmtList END      	=> "block";
 StmtList   -> Statement
            -> StmtList ';' Statement;
 Statement  -> Name ASSIGNMENT Expression          	=> "assign"
-           -> OUTPUT '(' Expression ')'           	=> "output"
+           -> OUTPUT '(' ExprList ')'             	=> "output"
            -> IF Expression THEN Statement
                             ELSE Statement       	=> "if"
+           -> IF Expression THEN Statement       	=> "if"
            -> WHILE Expression DO Statement      	=> "while"
            -> Body
 	   ->                                        	=> "<null>";
+
+ExprList   -> Expression
+           -> ExprList ',' Expression;
 
 Expression -> AddTerm
            -> AddTerm '=' AddTerm                 => "="
@@ -31,21 +35,22 @@ AddTerm    -> MulTerm
            -> AddTerm '-' MulTerm                 => "-"
            -> AddTerm OR MulTerm                  => "or";
 
-MulTerm    -> PowTerm
-           -> MulTerm '*' PowTerm                 => "*"
-           -> MulTerm '/' PowTerm                 => "/"
-           -> MulTerm AND PowTerm                 => "and"
-           -> MulTerm MOD PowTerm                 => "mod";
+MulTerm    -> UnaryTerm
+           -> MulTerm '*' UnaryTerm                 => "*"
+           -> MulTerm '/' UnaryTerm                 => "/"
+           -> MulTerm AND UnaryTerm                 => "and"
+           -> MulTerm MOD UnaryTerm                 => "mod";
 
-PowTerm    -> UnaryTerm
-           -> UnaryTerm EXP PowTerm               => "**";
+UnaryTerm  -> PowTerm
+           -> '-' PowTerm                       => "-"
+           -> '+' PowTerm                       => "u+"
+           -> NOT PowTerm                       => "not";
 
-UnaryTerm  -> Primary
-           -> '-' UnaryTerm                       => "-"
-           -> '+' UnaryTerm                       => "u+"
-           -> NOT UnaryTerm                       => "not";
+PowTerm    -> Primary
+           -> Primary EXP PowTerm               => "**";
 
 Primary    -> READ                                => "read"
+           -> EOFX                                => "eof"
            -> TRUE                                => "<true>"
            -> FALSE                               => "<false>"
            -> Name

@@ -31,25 +31,26 @@
 #define PlusNode       15
 #define MinusNode      16
 #define ReadNode       17
-#define IntegerNode    18
-#define IdentifierNode 19
-#define OrNode         20
-#define AndNode        21
-#define EqNode         22
-#define NeNode         23
-#define LtNode         24
-#define GtNode         25
-#define GeNode         26
-#define MultNode       27
-#define DivNode        28
-#define ModNode        29
-#define ExpNode        30
-#define UPlusNode      31
-#define NotNode        32
-#define TrueNode       33
-#define FalseNode      34
+#define EofNode        18
+#define IntegerNode    19
+#define IdentifierNode 20
+#define OrNode         21
+#define AndNode        22
+#define EqNode         23
+#define NeNode         24
+#define LtNode         25
+#define GtNode         26
+#define GeNode         27
+#define MultNode       28
+#define DivNode        29
+#define ModNode        30
+#define ExpNode        31
+#define UPlusNode      32
+#define NotNode        33
+#define TrueNode       34
+#define FalseNode      35
 
-#define NumberOfNodes  34
+#define NumberOfNodes  35
 
 typedef TreeNode UserType;
 
@@ -60,8 +61,8 @@ typedef TreeNode UserType;
 *****************************************************************/
 char *node[] = { "program", "types", "type", "dclns",
                  "dcln", "integer", "boolean", "block",
-                 "assign", "output", "if", "while", 
-                 "<null>", "<=", "+", "-", "read",
+                 "assign", "output", "if", "while",
+                 "<null>", "<=", "+", "-", "read", "eof",
                  "<integer>", "<identifier>",
                  "or", "and", "=", "<>", "<", ">", ">=",
                  "*", "/", "mod", "**", "u+", "not",
@@ -238,6 +239,9 @@ UserType Expression (TreeNode T)
  
       case ReadNode :
          return (TypeInteger);
+
+      case EofNode :
+         return (TypeBoolean);
 
       case IntegerNode :
          return (TypeInteger);
