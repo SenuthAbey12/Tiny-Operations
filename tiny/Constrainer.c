@@ -49,8 +49,18 @@
 #define NotNode        33
 #define TrueNode       34
 #define FalseNode      35
+#define ForNode        36
+#define DowntoNode     37
+#define RepeatNode     38
+#define CaseNode       39
+#define CaseClauseNode 40
+#define DotDotNode     41
+#define OtherwiseNode  42
+#define LoopNode       43
+#define ExitNode       44
+#define SwapNode       45
 
-#define NumberOfNodes  35
+#define NumberOfNodes  45
 
 typedef TreeNode UserType;
 
@@ -66,7 +76,10 @@ char *node[] = { "program", "types", "type", "dclns",
                  "<integer>", "<identifier>",
                  "or", "and", "=", "<>", "<", ">", ">=",
                  "*", "/", "mod", "**", "u+", "not",
-                 "<true>", "<false>"
+                 "<true>", "<false>",
+                 "for", "downto", "repeat", "case",
+                 "case_clause", "..", "otherwise",
+                 "loop", "exit", "swap"
                 };
 
 
@@ -75,6 +88,22 @@ boolean TraceSpecified;
 FILE *TraceFile;
 char *TraceFileName;
 int NumberTreesRead, index;
+
+#define MAX_FOR_DEPTH 20
+static String ForVars[MAX_FOR_DEPTH];
+static int ForVarCount = 0;
+/* LoopContext: 0=not in loop, 1=in loop-pool, 2=in for */
+static int LoopContext = 0;
+static int LoopExitCount[MAX_FOR_DEPTH];
+static int LoopNestingDepth = 0;
+
+static int IsForVar(String name)
+{
+   int i;
+   for (i = 0; i < ForVarCount; i++)
+      if (ForVars[i] == name) return 1;
+   return 0;
+}
 
 
 void Constrain(void)    
@@ -210,6 +239,16 @@ UserType Expression (TreeNode T)
 
       case EqNode :
       case NeNode :
+         Type1 = Expression (Child(T,1));
+         Type2 = Expression (Child(T,2));
+         if (Type1 != Type2)
+         {
+            ErrorHeader(Child(T,1));
+            printf ("ARGUMENTS OF '=', '<>' MUST BE SAME TYPE\n");
+            printf ("\n");
+         }
+         return (TypeBoolean);
+
       case LtNode :
       case GtNode :
       case GeNode :
@@ -218,7 +257,7 @@ UserType Expression (TreeNode T)
          if (Type1 != TypeInteger || Type2 != TypeInteger)
          {
             ErrorHeader(Child(T,1));
-            printf ("ARGUMENTS OF '=', '<>', '<', '>', '>=' MUST BE TYPE INTEGER\n");
+            printf ("ARGUMENTS OF '<', '>', '>=' MUST BE TYPE INTEGER\n");
             printf ("\n");
          }
          return (TypeBoolean);
@@ -357,6 +396,12 @@ void ProcessNode (TreeNode T)
             printf ("ASSIGNMENT TYPES DO NOT MATCH\n");
             printf ("\n");
          }
+         if (IsForVar(NodeName(Child(Child(T,1),1))))
+         {
+            ErrorHeader(T);
+            printf ("CANNOT ASSIGN TO FOR LOOP CONTROL VARIABLE\n");
+            printf ("\n");
+         }
          break;
 
       case OutputNode :
@@ -393,6 +438,144 @@ void ProcessNode (TreeNode T)
          break;
 
       case NullNode : 
+         break;
+
+      case ForNode :
+      case DowntoNode :
+      {
+         int savedContext;
+         String varName;
+         Type1 = Expression (Child(T,1));
+         Type2 = Expression (Child(T,2));
+         Type3 = Expression (Child(T,3));
+         if (Type1 != Type2 || Type1 != Type3)
+         {
+            ErrorHeader(T);
+            printf ("FOR LOOP TYPES DO NOT MATCH\n");
+            printf ("\n");
+         }
+         varName = NodeName(Child(Child(T,1),1));
+         if (IsForVar(varName))
+         {
+            ErrorHeader(T);
+            printf ("CANNOT REUSE FOR LOOP CONTROL VARIABLE\n");
+            printf ("\n");
+         }
+         ForVars[ForVarCount++] = varName;
+         savedContext = LoopContext;
+         LoopContext = 2;
+         ProcessNode (Child(T,4));
+         LoopContext = savedContext;
+         ForVarCount--;
+         break;
+      }
+
+      case RepeatNode :
+         for (Kid = 1; Kid < NKids(T); Kid++)
+            ProcessNode (Child(T,Kid));
+         if (Expression (Child(T, NKids(T))) != TypeBoolean)
+         {
+            ErrorHeader(T);
+            printf ("REPEAT EXPRESSION NOT OF TYPE BOOLEAN\n");
+            printf ("\n");
+         }
+         break;
+
+      case CaseNode :
+         Type1 = Expression (Child(T,1));
+         for (Kid = 2; Kid <= NKids(T); Kid++)
+         {
+            TreeNode clause = Child(T,Kid);
+            if (NodeName(clause) == CaseClauseNode)
+            {
+               Type2 = Expression (Child(clause,1));
+               if (Type1 != Type2)
+               {
+                  ErrorHeader(clause);
+                  printf ("CASE LABEL TYPE DOES NOT MATCH\n");
+                  printf ("\n");
+               }
+               ProcessNode (Child(clause,2));
+            }
+            else if (NodeName(clause) == DotDotNode)
+            {
+               Type2 = Expression (Child(clause,1));
+               Type3 = Expression (Child(clause,2));
+               if (Type1 != Type2 || Type1 != Type3)
+               {
+                  ErrorHeader(clause);
+                  printf ("CASE RANGE TYPE DOES NOT MATCH\n");
+                  printf ("\n");
+               }
+               ProcessNode (Child(clause,3));
+            }
+            else if (NodeName(clause) == OtherwiseNode)
+            {
+               ProcessNode (Child(clause,1));
+            }
+         }
+         break;
+
+      case LoopNode :
+      {
+         int savedContext;
+         savedContext = LoopContext;
+         LoopContext = 1;
+         LoopNestingDepth++;
+         LoopExitCount[LoopNestingDepth] = 0;
+         for (Kid = 1; Kid <= NKids(T); Kid++)
+            ProcessNode (Child(T,Kid));
+         if (LoopExitCount[LoopNestingDepth] == 0)
+         {
+            ErrorHeader(T);
+            printf ("LOOP HAS NO EXIT\n");
+            printf ("\n");
+         }
+         LoopNestingDepth--;
+         LoopContext = savedContext;
+         break;
+      }
+
+      case ExitNode :
+         if (LoopContext == 0)
+         {
+            ErrorHeader(T);
+            printf ("EXIT NOT INSIDE A LOOP STATEMENT\n");
+            printf ("\n");
+         }
+         else if (LoopContext == 2)
+         {
+            ErrorHeader(T);
+            printf ("CANNOT EXIT FROM A FOR LOOP\n");
+            printf ("\n");
+         }
+         else
+         {
+            LoopExitCount[LoopNestingDepth]++;
+         }
+         break;
+
+      case SwapNode :
+         Type1 = Expression (Child(T,1));
+         Type2 = Expression (Child(T,2));
+         if (Type1 != Type2)
+         {
+            ErrorHeader(T);
+            printf ("SWAP TYPES DO NOT MATCH\n");
+            printf ("\n");
+         }
+         if (IsForVar(NodeName(Child(Child(T,1),1))))
+         {
+            ErrorHeader(T);
+            printf ("CANNOT SWAP FOR LOOP CONTROL VARIABLE\n");
+            printf ("\n");
+         }
+         if (IsForVar(NodeName(Child(Child(T,2),1))))
+         {
+            ErrorHeader(T);
+            printf ("CANNOT SWAP FOR LOOP CONTROL VARIABLE\n");
+            printf ("\n");
+         }
          break;
 
       default :

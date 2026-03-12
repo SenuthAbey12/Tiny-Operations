@@ -107,13 +107,27 @@
 #define    NotNode      80   /* 'not'      */
 #define    TrueNode     81   /* '<true>'   */
 #define    FalseNode    82   /* '<false>'  */
+#define    ForNode      83   /* 'for'      */
+#define    DowntoNode   84   /* 'downto'   */
+#define    RepeatNode   85   /* 'repeat'   */
+#define    CaseNode     86   /* 'case'     */
+#define    CaseClauseNode 87 /* 'case_clause' */
+#define    DotDotNode   88   /* '..'       */
+#define    OtherwiseNode 89  /* 'otherwise'*/
+#define    LoopNode     90   /* 'loop'     */
+#define    ExitNode     91   /* 'exit'     */
+#define    SwapNode     92   /* 'swap'     */
 
-#define    NumberOfNodes 82
+#define    NumberOfNodes 92
 typedef int Mode;
 
 FILE *CodeFile;
 char *CodeFileName;
 Clabel HaltLabel;
+
+#define MAX_LOOP_DEPTH 20
+static Clabel LoopExitLabel[MAX_LOOP_DEPTH];
+static int LoopDepth = 0;
 
 char *mach_op[] = 
     {"NOP","HALT","LIT","LLV","LGV","SLV","SGV","LLA","LGA",
@@ -134,7 +148,10 @@ char *node_name[] =
    "<null>","<=","+","-","read","eof","<integer>","<identifier>",
      "or","and","=","<>","<",">",">=",
      "*","/","mod","**","u+","not",
-     "<true>","<false>"};
+     "<true>","<false>",
+     "for","downto","repeat","case",
+     "case_clause","..","otherwise",
+     "loop","exit","swap"};
 
 
 void CodeGenerate(int argc, char *argv[])
@@ -532,6 +549,188 @@ Clabel ProcessNode (TreeNode T, Clabel CurrLabel)
 
 
        case NullNode : return(CurrLabel);
+
+
+      case ForNode :
+      case DowntoNode :
+         /* i := start */
+         Expression (Child(T,2), CurrLabel);
+         Reference (Child(T,1), LeftMode, NoLabel);
+
+         Label1 = MakeLabel();  /* condition */
+         Label2 = MakeLabel();  /* body */
+         Label3 = MakeLabel();  /* after loop */
+
+         /* condition: i <= end (for) or i >= end (downto) */
+         Reference (Child(T,1), RightMode, Label1);
+         Expression (Child(T,3), NoLabel);
+         if (NodeName(T) == ForNode)
+            CodeGen1 (BOPOP, BLE, NoLabel);
+         else
+            CodeGen1 (BOPOP, BGE, NoLabel);
+         DecrementFrameSize();
+         CodeGen2 (CONDOP, Label2, Label3, NoLabel);
+         DecrementFrameSize();
+
+         /* body */
+         CurrLabel = ProcessNode (Child(T,4), Label2);
+
+         /* increment/decrement */
+         Reference (Child(T,1), RightMode, CurrLabel);
+         if (NodeName(T) == ForNode)
+            CodeGen1 (UOPOP, USUCC, NoLabel);
+         else
+            CodeGen1 (UOPOP, UPRED, NoLabel);
+         Reference (Child(T,1), LeftMode, NoLabel);
+
+         CodeGen1 (GOTOOP, Label1, NoLabel);
+         return (Label3);
+
+
+      case RepeatNode :
+         if (CurrLabel == NoLabel)
+            Label1 = MakeLabel();
+         else
+            Label1 = CurrLabel;
+         Label2 = MakeLabel();
+
+         CurrLabel = Label1;
+         for (Kid = 1; Kid < NKids(T); Kid++)
+            CurrLabel = ProcessNode (Child(T,Kid), CurrLabel);
+
+         Expression (Child(T, NKids(T)), CurrLabel);
+         CodeGen2 (CONDOP, Label2, Label1, NoLabel);
+         DecrementFrameSize();
+         return (Label2);
+
+
+      case CaseNode :
+      {
+         Clabel endLabel, bodyLabel, nextLabel;
+         int FS_expr, hasOtherwise;
+
+         endLabel = MakeLabel();
+         Expression (Child(T,1), CurrLabel);
+         FS_expr = FrameSize;
+
+         nextLabel = NoLabel;
+         hasOtherwise = 0;
+
+         for (Kid = 2; Kid <= NKids(T); Kid++)
+         {
+            TreeNode clause = Child(T, Kid);
+
+            if (NodeName(clause) == OtherwiseNode)
+            {
+               hasOtherwise = 1;
+               CodeGen1 (POPOP, MakeStringOf(1), nextLabel);
+               DecrementFrameSize();
+               CurrLabel = ProcessNode (Child(clause,1), NoLabel);
+               CodeGen1 (GOTOOP, endLabel, CurrLabel);
+               break;
+            }
+            else if (NodeName(clause) == CaseClauseNode)
+            {
+               bodyLabel = MakeLabel();
+               Label1 = MakeLabel();  /* next clause */
+
+               CodeGen0 (DUPOP, nextLabel);
+               IncrementFrameSize();
+               Expression (Child(clause,1), NoLabel);
+               CodeGen1 (BOPOP, BEQ, NoLabel);
+               DecrementFrameSize();
+               CodeGen2 (CONDOP, bodyLabel, Label1, NoLabel);
+               DecrementFrameSize();
+
+               /* matched body */
+               CodeGen1 (POPOP, MakeStringOf(1), bodyLabel);
+               DecrementFrameSize();
+               CurrLabel = ProcessNode (Child(clause,2), NoLabel);
+               CodeGen1 (GOTOOP, endLabel, CurrLabel);
+
+               FrameSize = FS_expr;
+               nextLabel = Label1;
+            }
+            else if (NodeName(clause) == DotDotNode)
+            {
+               Clabel checkUpper;
+
+               bodyLabel = MakeLabel();
+               Label1 = MakeLabel();  /* next clause */
+               checkUpper = MakeLabel();
+
+               /* check expr >= lower */
+               CodeGen0 (DUPOP, nextLabel);
+               IncrementFrameSize();
+               Expression (Child(clause,1), NoLabel);
+               CodeGen1 (BOPOP, BGE, NoLabel);
+               DecrementFrameSize();
+               CodeGen2 (CONDOP, checkUpper, Label1, NoLabel);
+               DecrementFrameSize();
+
+               /* check expr <= upper */
+               CodeGen0 (DUPOP, checkUpper);
+               IncrementFrameSize();
+               Expression (Child(clause,2), NoLabel);
+               CodeGen1 (BOPOP, BLE, NoLabel);
+               DecrementFrameSize();
+               CodeGen2 (CONDOP, bodyLabel, Label1, NoLabel);
+               DecrementFrameSize();
+
+               /* matched body */
+               CodeGen1 (POPOP, MakeStringOf(1), bodyLabel);
+               DecrementFrameSize();
+               CurrLabel = ProcessNode (Child(clause,3), NoLabel);
+               CodeGen1 (GOTOOP, endLabel, CurrLabel);
+
+               FrameSize = FS_expr;
+               nextLabel = Label1;
+            }
+         }
+
+         if (!hasOtherwise)
+         {
+            CodeGen1 (POPOP, MakeStringOf(1), nextLabel);
+            DecrementFrameSize();
+         }
+         return (endLabel);
+      }
+
+
+      case LoopNode :
+      {
+         Clabel exitLabel;
+         if (CurrLabel == NoLabel)
+            Label1 = MakeLabel();
+         else
+            Label1 = CurrLabel;
+         exitLabel = MakeLabel();
+
+         LoopDepth++;
+         LoopExitLabel[LoopDepth] = exitLabel;
+
+         CurrLabel = Label1;
+         for (Kid = 1; Kid <= NKids(T); Kid++)
+            CurrLabel = ProcessNode (Child(T,Kid), CurrLabel);
+
+         CodeGen1 (GOTOOP, Label1, CurrLabel);
+
+         LoopDepth--;
+         return (exitLabel);
+      }
+
+
+      case ExitNode :
+         CodeGen1 (GOTOOP, LoopExitLabel[LoopDepth], CurrLabel);
+         return (NoLabel);
+
+
+      case SwapNode :
+         Reference (Child(T,1), RightMode, CurrLabel);
+         Reference (Child(T,2), RightMode, NoLabel);
+         Reference (Child(T,1), LeftMode, NoLabel);
+         Reference (Child(T,2), LeftMode, NoLabel);
+         return (NoLabel);
 
  
       default :

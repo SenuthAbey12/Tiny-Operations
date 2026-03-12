@@ -16,8 +16,26 @@ Statement  -> Name ASSIGNMENT Expression          	=> "assign"
                             ELSE Statement       	=> "if"
            -> IF Expression THEN Statement       	=> "if"
            -> WHILE Expression DO Statement      	=> "while"
+           -> FOR Name ASSIGNMENT Expression
+                  TO Expression DO Statement      	=> "for"
+           -> FOR Name ASSIGNMENT Expression
+                  DOWNTO Expression DO Statement  	=> "downto"
+           -> REPEAT StmtList UNTIL Expression   	=> "repeat"
+           -> CASE Expression OF (Caseclause ';')*
+                  OtherwiseClause END            	=> "case"
+           -> CASE Expression OF (Caseclause ';')*
+                  END                            	=> "case"
+           -> LOOP StmtList POOL                 	=> "loop"
+           -> EXIT                               	=> "exit"
+           -> Name SWAP Name                     	=> "swap"
            -> Body
 	   ->                                        	=> "<null>";
+
+Caseclause -> Expression ':' Statement           	=> "case_clause"
+           -> Expression DOTDOT Expression ':'
+                  Statement                      	=> "..";
+
+OtherwiseClause -> OTHERWISE Statement           	=> "otherwise";
 
 ExprList   -> Expression
            -> ExprList ',' Expression;
