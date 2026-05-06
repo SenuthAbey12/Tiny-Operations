@@ -19,8 +19,10 @@ def run_compiler(abs_filepath):
             return False
             
     # 2. Constrain
+    # Wrap in bash with an extra command to force a fork, so bash doesn't use exec.
+    # This prevents the parent PID from being the Python script!
     constrain_proc = subprocess.run(
-        ['./Constrain'], 
+        ['bash', '-c', './Constrain; exit $?'], 
         stdout=subprocess.DEVNULL, 
         stderr=subprocess.DEVNULL
     )
@@ -29,7 +31,7 @@ def run_compiler(abs_filepath):
         
     # 3. CodeGen
     codegen_proc = subprocess.run(
-        ['./CodeGen'], 
+        ['bash', '-c', './CodeGen; exit $?'], 
         stdout=subprocess.DEVNULL, 
         stderr=subprocess.DEVNULL
     )
