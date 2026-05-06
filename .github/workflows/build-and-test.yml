@@ -21,6 +21,7 @@ jobs:
 
     - name: Build the C Project
       run: |
+        mkdir -p bin
         make clean
         make
 
