@@ -64,16 +64,31 @@ def main():
             print(f"[FAIL] {display_name} (Expected {'Success' if expect_success else 'Failure'}, got {'Success' if success else 'Failure'})")
             failed += 1
 
-    # Test specific files in tiny/tests
-    print("\nRunning specific tests (p1, p2, p3) in tiny/tests...")
-    target_tests = ['p1', 'p2', 'p3']
-    if os.path.exists(tests_dir):
-        for f in target_tests:
-            filepath = os.path.join(tests_dir, f)
-            if os.path.isfile(filepath):
+    # 1. Test files in tiny/test-progs
+    print("Running tests in tiny/test-progs...")
+    if os.path.exists(test_progs_dir):
+        for f in sorted(os.listdir(test_progs_dir)):
+            filepath = os.path.join(test_progs_dir, f)
+            if not os.path.isfile(filepath):
+                continue
+                
+            # If the filename contains '.c', it should compile successfully
+            if '.c' in f:
                 test_file(filepath, True)
-            else:
-                print(f"[ERROR] Could not find test file: {filepath}")
+            # If the filename contains '.e', it should result in an error
+            elif '.e' in f:
+                test_file(filepath, False)
+
+    # 2. Test files in tiny/tests (p1, p2, etc.)
+    print("\nRunning tests in tiny/tests...")
+    if os.path.exists(tests_dir):
+        for f in sorted(os.listdir(tests_dir)):
+            filepath = os.path.join(tests_dir, f)
+            if not os.path.isfile(filepath):
+                continue
+            
+            # We assume all programs in 'tiny/tests' are correct
+            test_file(filepath, True)
 
     print("\n=== Test Summary ===")
     print(f"Passed: {passed}")
@@ -81,8 +96,10 @@ def main():
     
     if failed > 0:
         sys.exit(1)
+        print("Tests failed")
     else:
         sys.exit(0)
+        print("Tests passed")
 
 if __name__ == '__main__':
     main()
