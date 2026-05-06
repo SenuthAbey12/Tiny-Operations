@@ -34,8 +34,7 @@ int TreeCheck(TREENODE *node)
          break;
 	 
       default:
-	 printf("*** unrecognized token: ",node->string);
-	 printf("%s\n",node->string);
+	 printf("*** unrecognized token: %s\n",node->string);
 	 return 1;
 	 break;
    }

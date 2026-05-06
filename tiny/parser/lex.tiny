@@ -64,7 +64,6 @@ STR     \"([^\\\"\n]|\\.)*\"
 "chr"        { return rule(CHR); }
 "mod"        { return rule(MOD); }
 "not"        { return rule(NOT); }
-":=" 		{ return rule(ASSIGNMENT); }
 "**"         { return rule(EXP); }
 "<=" 		{ return rule(LTE); }
 "<>"         { return rule(NE); }
