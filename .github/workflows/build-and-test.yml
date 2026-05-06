@@ -24,24 +24,6 @@ jobs:
         make clean
         make
 
-    - name: Compile Correct Test Cases
+    - name: Run Tests
       run: |
-        cd tiny
-        echo "Testing all 'c' (correct) test cases..."
-        
-        # We only run the parser, constrainer, and codegen. 
-        # We skip the interpreter to avoid the action hanging on programs that wait for user input (read).
-        for file in test-progs/*.c*; do
-          echo "Compiling $file"
-          
-          # 1. Parse
-          parser/parse < "$file" || { echo "Parsing failed on $file"; exit 1; }
-          
-          # 2. Constrain
-          ./Constrain > /dev/null || { echo "Constrainer failed on $file"; exit 1; }
-          
-          # 3. Generate Code
-          ./CodeGen > /dev/null || { echo "CodeGen failed on $file"; exit 1; }
-          
-        done
-        echo "All correct test cases compiled successfully!"
+        python3 run_tests.py
