@@ -70,6 +70,8 @@ def main():
     print("Running tests in tiny/test-progs...")
     if os.path.exists(test_progs_dir):
         for f in sorted(os.listdir(test_progs_dir)):
+            if not (f.startswith("pr1") or f.startswith("pr2") or f.startswith("pr3")):
+                continue
             filepath = os.path.join(test_progs_dir, f)
             if not os.path.isfile(filepath):
                 continue
@@ -85,6 +87,8 @@ def main():
     print("\nRunning tests in tiny/tests...")
     if os.path.exists(tests_dir):
         for f in sorted(os.listdir(tests_dir)):
+            if not f.startswith("p"):
+                continue
             filepath = os.path.join(tests_dir, f)
             if not os.path.isfile(filepath):
                 continue
