@@ -18,16 +18,19 @@ COMM2   #.*\n
 IDENT	[_a-zA-Z][_a-zA-Z0-9]*
 INT	[0-9]+
 WHITE   [ \t\v\f]*
-LIT     '[^\']+'
-STR     \"[^\"]+\"
+CHARLIT '([^\\'\n]|\\[ntr0\\'\"])'
+STR     \"([^\\\"\n]|\\.)*\"
 %%
 
 {WHITE}    	{ column += yyleng; }
 \n         	{ column = 1; line++; }
 "program"    	{ return rule(PROGRAM); }
 "var" 		{ return rule(VAR); }
+"const" 	{ return rule(CONST); }
+"type" 	{ return rule(TYPEX); }
 "integer" 	{ return rule(INTEGER); }
 "boolean" 	{ return rule(BOOLEAN); }
+"char" 	{ return rule(CHAR); }
 "begin" 	{ return rule(BEGINX); }
 "end" 		{ return rule(END); }
 ":=:" 		{ return rule(SWAP); }
@@ -38,50 +41,57 @@ STR     \"[^\"]+\"
 "else" 		{ return rule(ELSE); }
 "while" 	{ return rule(WHILE); }
 "do" 		{ return rule(DO); }
-"for" 		{ return rule(FOR); }
-"to" 		{ return rule(TO); }
-"downto" 	{ return rule(DOWNTO); }
-"repeat" 	{ return rule(REPEAT); }
-"until" 	{ return rule(UNTIL); }
-"case" 		{ return rule(CASE); }
-"of" 		{ return rule(OF); }
-"otherwise" 	{ return rule(OTHERWISE); }
-"loop" 		{ return rule(LOOP); }
-"pool" 		{ return rule(POOL); }
-"exit" 		{ return rule(EXIT); }
-"and" 		{ return rule(AND); }
-"or" 		{ return rule(OR); }
-"mod" 		{ return rule(MOD); }
-"<=" 		{ return rule(LTE); }
-"<>" 		{ return rule(NE); }
-">=" 		{ return rule(GE); }
-"**" 		{ return rule(EXP); }
-"not"       { return rule(NOT); }
+"for"        { return rule(FOR); }
+"repeat"     { return rule(REPEAT); }
+"until"      { return rule(UNTIL); }
+"loop"       { return rule(LOOP); }
+"pool"       { return rule(POOL); }
+"exit"       { return rule(EXIT); }
+"case"       { return rule(CASE); }
+"of"         { return rule(OF); }
+"otherwise"  { return rule(OTHERWISE); }
+"to"         { return rule(TO); }
+"downto"     { return rule(DOWNTO); }
+"and"        { return rule(AND); }
+"or"         { return rule(OR); }
+"true"       { return rule(TRUE); }
+"false"      { return rule(FALSE); }
+"eof"        { return rule(EOFX); }
 "read" 		{ return rule(READ); }
-"eof"       { return rule(EOFX); }
-"true"		{ return rule(TRUE); }
-"false"		{ return rule(FALSE); }
+"succ"       { return rule(SUCC); }
+"pred"       { return rule(PRED); }
+"ord"        { return rule(ORD); }
+"chr"        { return rule(CHR); }
+"mod"        { return rule(MOD); }
+"not"        { return rule(NOT); }
+":=" 		{ return rule(ASSIGNMENT); }
+"**"         { return rule(EXP); }
+"<=" 		{ return rule(LTE); }
+"<>"         { return rule(NE); }
+">="         { return rule(GTE); }
+"<"          { return rule(LT); }
+">"          { return rule(GT); }
+"="          { return rule(EQ); }
+"*"          { return rule('*'); }
+"/"          { return rule('/'); }
 {INT}		{ return node(INTEGER_NUM); }
+{CHARLIT}	{ return node(CHARACTER); }
+{STR}		{ return node(STRING); }
 {IDENT}		{ return node(IDENTIFIER); }
 "{"		{ column += yyleng; BEGIN( COMM1 ); }
 <COMM1>[^}\n]+  { column += yyleng; }
 <COMM1>"}"	{ column += yyleng; BEGIN( INITIAL ); }
 <COMM1>\n	{ column = 1; line++; }
 {COMM2}         { column = 1; line++; }
+".."            { return rule(DOTDOT); }
 ":"             { return rule(yytext[0]); }
 ";"             { return rule(yytext[0]); }
-".."            { return rule(DOTDOT); }
 "."             { return rule(yytext[0]); }
 ","             { return rule(yytext[0]); }
 "("             { return rule(yytext[0]); }
 ")"             { return rule(yytext[0]); }
 "+"             { return rule(yytext[0]); }
 "-"             { return rule(yytext[0]); }
-"*"             { return rule(yytext[0]); }
-"/"             { return rule(yytext[0]); }
-"="             { return rule(yytext[0]); }
-"<"             { return rule(yytext[0]); }
-">"             { return rule(yytext[0]); }
 .               { yyerror("unrecognized char");
                   printf("-->%s<--\n",yytext);
                   column++; }  
@@ -119,4 +129,3 @@ void yyerror(char* message)
     printf("****** %s @line %d, column %d\n",
 	   message,line,column);
 }
-

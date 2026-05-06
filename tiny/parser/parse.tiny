@@ -1,78 +1,90 @@
 %%
-Tiny       -> PROGRAM Name ':' Dclns Body Name '.' 	=> "program";
+Tiny       -> PROGRAM Name ':' Consts Types Dclns Body Name '.' 	=> "program";
+Consts     -> CONST (ConstDef ';')*			=> "consts"
+           -> 					     	=> "consts";
+ConstDef   -> Name EQ Constant				=> "const";
+Types      -> TYPEX (TypeDef ';')*			=> "types"
+           -> 					     	=> "types";
+TypeDef    -> Name EQ Type				=> "type";
 Dclns      -> VAR (Dcln ';')*				=> "dclns"
            -> 					     	=> "dclns";
-Dcln       -> NameList ':' Type				=> "dcln";
-NameList   -> Name
-           -> NameList ',' Name;
+Dcln       -> Name list ',' ':' Type			=> "dcln";
 Type       -> INTEGER 		             		=> "integer"
-           -> BOOLEAN				     	=> "boolean";
-Body       -> BEGINX StmtList END      	=> "block";
-StmtList   -> Statement
-           -> StmtList ';' Statement;
+           -> BOOLEAN				     	=> "boolean"
+           -> CHAR				     	=> "char"
+           -> Name
+           -> '(' Name list ',' ')'			=> "enum";
+Body       -> BEGINX Statement list ';' END      	=> "block";
 Statement  -> Name ASSIGNMENT Expression          	=> "assign"
-           -> OUTPUT '(' ExprList ')'             	=> "output"
+           -> OUTPUT '(' OutputItem list ',' ')'  	=> "output"
+           -> READ '(' Name list ',' ')'		=> "read"
            -> IF Expression THEN Statement
                             ELSE Statement       	=> "if"
            -> IF Expression THEN Statement       	=> "if"
            -> WHILE Expression DO Statement      	=> "while"
-           -> FOR Name ASSIGNMENT Expression
-                  TO Expression DO Statement      	=> "for"
-           -> FOR Name ASSIGNMENT Expression
-                  DOWNTO Expression DO Statement  	=> "downto"
-           -> REPEAT StmtList UNTIL Expression   	=> "repeat"
-           -> CASE Expression OF (Caseclause ';')*
-                  OtherwiseClause END            	=> "case"
-           -> CASE Expression OF (Caseclause ';')*
-                  END                            	=> "case"
-           -> LOOP StmtList POOL                 	=> "loop"
-           -> EXIT                               	=> "exit"
-           -> Name SWAP Name                     	=> "swap"
+           -> FOR Name ASSIGNMENT Expression TO Expression DO Statement     => "for"
+           -> FOR Name ASSIGNMENT Expression DOWNTO Expression DO Statement => "downto"
+           -> Name SWAP Name                                              => "swap"
+           -> REPEAT Statement list ';' UNTIL Expression                  => "repeat"
+           -> LOOP Statement list ';' POOL                                => "loop"
+           -> EXIT                                                         => "exit"
+           -> CASE Expression OF (Caseclause ';')* END                    => "case"
+           -> CASE Expression OF (Caseclause ';')* OTHERWISE Statement END => "case"
+           -> CASE Expression OF (Caseclause ';')* OTHERWISE Statement ';' END => "case"
            -> Body
 	   ->                                        	=> "<null>";
 
-Caseclause -> Expression ':' Statement           	=> "case_clause"
-           -> Expression DOTDOT Expression ':'
-                  Statement                      	=> "..";
+Caseclause -> CaseValue ':' Statement => "caseclause";
 
-OtherwiseClause -> OTHERWISE Statement           	=> "otherwise";
+CaseValue  -> Constant DOTDOT Constant			=> ".."
+           -> Constant;
 
-ExprList   -> Expression
-           -> ExprList ',' Expression;
+Constant   -> INTEGER_NUM				=> "<integer>"
+           -> CHARACTER				=> "<char>"
+           -> TRUE					=> "true"
+           -> FALSE					=> "false"
+           -> Name;
 
-Expression -> AddTerm
-           -> AddTerm '=' AddTerm                 => "="
-           -> AddTerm NE AddTerm                  => "<>"
-           -> AddTerm '<' AddTerm                 => "<"
-           -> AddTerm '>' AddTerm                 => ">"
-           -> AddTerm LTE AddTerm                 => "<="
-           -> AddTerm GE AddTerm                  => ">=";
+OutputItem -> Expression
+           -> STRING					=> "<string>";
 
-AddTerm    -> MulTerm
-           -> AddTerm '+' MulTerm                 => "+"
-           -> AddTerm '-' MulTerm                 => "-"
-           -> AddTerm OR MulTerm                  => "or";
+Expression -> Simp_Expr	                         		
+	   -> Simp_Expr LTE Simp_Expr			=> "<="
+	   -> Simp_Expr EQ Simp_Expr			=> "="
+	   -> Simp_Expr NE Simp_Expr			=> "<>"
+	   -> Simp_Expr GTE Simp_Expr			=> ">="
+	   -> Simp_Expr LT Simp_Expr			=> "<"
+	   -> Simp_Expr GT Simp_Expr			=> ">";
 
-MulTerm    -> UnaryTerm
-           -> MulTerm '*' UnaryTerm                 => "*"
-           -> MulTerm '/' UnaryTerm                 => "/"
-           -> MulTerm AND UnaryTerm                 => "and"
-           -> MulTerm MOD UnaryTerm                 => "mod";
+Simp_Expr  -> Term
+	   -> Simp_Expr '+' Term			=> "+"
+	   -> Simp_Expr '-' Term			=> "-"
+	   -> Simp_Expr OR Term				=> "or";
 
-UnaryTerm  -> PowTerm
-           -> '-' PowTerm                       => "-"
-           -> '+' PowTerm                       => "u+"
-           -> NOT PowTerm                       => "not";
+Term       -> Factor
+	   -> Term '*' Factor				=> "*"
+	   -> Term '/' Factor				=> "/"
+	   -> Term AND Factor				=> "and"
+	   -> Term MOD Factor				=> "mod";
 
-PowTerm    -> Primary
-           -> Primary EXP PowTerm               => "**";
+Factor     -> Power
+           -> '-' Factor                            => "-"
+	   -> '+' Factor                            => "+"
+	   -> NOT Factor                            => "not";
 
-Primary    -> READ                                => "read"
-           -> EOFX                                => "eof"
-           -> TRUE                                => "<true>"
-           -> FALSE                               => "<false>"
+Power      -> Primary
+           -> Primary EXP Power				=> "**";
+
+Primary    -> EOFX                                 	=> "eof"
+	   -> TRUE                                 	=> "true"
+	   -> FALSE                                	=> "false"
+	   -> CHARACTER				=> "<char>"
+	   -> SUCC '(' Expression ')'			=> "succ"
+	   -> PRED '(' Expression ')'			=> "pred"
+	   -> ORD '(' Expression ')'			=> "ord"
+	   -> CHR '(' Expression ')'			=> "chr"
            -> Name
-           -> INTEGER_NUM                         => "<integer>"
+           -> INTEGER_NUM				=> "<integer>"
            -> '(' Expression ')';
 
 Name       -> IDENTIFIER				=> "<identifier>";
