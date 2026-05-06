@@ -128,7 +128,8 @@ void DTEnter(String S, TreeNode T, TreeNode Source)
       WriteString(stdout, SourceLocation(Source));
       printf(" : ");
       WriteString(stdout, S); 
-      printf("ALREADY DECLARED IN THIS BLOCK !!\n");
+      printf(" ALREADY DECLARED IN THIS BLOCK !!\n");
+      IncrementErrorCount(1);
    }
 
    else 
