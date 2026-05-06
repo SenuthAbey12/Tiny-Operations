@@ -15,6 +15,7 @@ Constrain.c  -  This module is the driver for the Constrainer
 #include <header/Text.h>
 #include <header/String_Input.h>
 #include <header/Tree.h>
+#include <header/Open_File.h>
 
 main(int argc, char *argv)
 {
