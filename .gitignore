@@ -1,0 +1,30 @@
+# Object files
+*.o
+
+# Binaries and Executables
+bin/interpret
+bin/pgen
+bin/print_tree
+tiny/Constrain
+tiny/CodeGen
+tiny/parser/parse
+
+# Flex/Bison generated files
+y.tab.c
+y.tab.h
+y.output
+lex.yy.c
+code.y
+
+# Tiny Compiler execution artifacts (trees, code, traces)
+_*
+_TREE
+_CODE
+_CONS
+_CGEN
+
+# OS, Editor, and crash artifacts
+*~
+core
+a.out
+.DS_Store
